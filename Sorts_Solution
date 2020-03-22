@@ -1,1 +1,71 @@
-堆排序的迭代实现
+堆排序的迭代实现 :
+
+#include <bits/stdc++.h>
+using namespace std;
+/*** 排序基础函数 ***/
+class My_Sort {
+public :
+    virtual void Sorts(vector<int>& arr) = 0;
+};
+/******/
+class My_Sort_Heap : public My_Sort {
+public :
+    /***
+    堆排序 : 时间复杂度 O(n * log(n)), 空间复杂度: O(1) (迭代实现)
+    将整个数组看作一个完全二叉树，通过不断维护将整个数组保证成为一个大根堆，每次将
+    完全二叉树结尾节点和根节点互换位置，然后剪去末尾节点加入数组尾部，来实现排序。
+    ***/
+    virtual void Sorts(vector<int>& arr) {
+        if (arr.empty()) return ; //非法输入检测
+        int n = arr.size();
+        Build_Heap(arr, n); //先维护住整体heap性质
+        for (int i = n - 1; i >= 0; -- i) {
+            swap(arr[0], arr[i]); //根和尾交换值
+            Sink(arr, 0, i); // 从根开始修改，但注意，整个完全二叉树大小改变了。
+        }
+    };
+private:
+    /** Sink操作主要用于维护heap性质，确保子节点值小于当前节点值 **/
+    void Sink(vector<int> &arr, int idx, int n) {
+        while (idx * 2 + 1 < n) { //最多置换到完全二叉树的底部
+            int mxx = idx;
+            int left = idx * 2 + 1; // 检查左儿子
+            if (left < n and arr[left] > arr[mxx]) {
+                mxx = left;
+            }
+            int right = idx * 2 + 2; // 检查右儿子
+            if (right < n and arr[right] > arr[mxx]) {
+                mxx = right;
+            }
+            if (mxx == idx) break; // 如果当前符合heap性质
+            swap(arr[idx], arr[mxx]); //交换值
+            idx = mxx; //检查下一个节点
+        }
+    }
+    /** Build_Heap 主要用于从完全二叉子树最后一个节点的父节点开始依次由底向上维护整棵树heap性质 **/
+    void Build_Heap(vector<int>& arr, int sizes) {
+        int lst_node = sizes - 1; // 完全二叉树最后一个节点
+        int lst_pre = (lst_node - 1) / 2; //最后一个节点的父亲
+        for (int i = lst_pre; i >= 0; -- i) {
+            Sink(arr, i, sizes); // build heap from bottom to top
+        }
+    }
+
+};
+void Test_fuc() {
+    int n; scanf("%d", &n);
+    vector<int> arr(n);
+    for (int i = 0; i < n; ++ i) {
+        scanf("%d", &arr[i]);
+    }
+    My_Sort* solution = new My_Sort_Heap;
+    solution->Sorts(arr);
+    delete solution;
+    for (int i = 0; i < n; ++ i) {
+        printf("%d%c", arr[i], i == n - 1 ? '\n' : ' ');
+    }
+}
+signed main() {
+    Test_fuc();
+    return 0;
+}
