@@ -1,0 +1,1 @@
+# Solution_of_problem_in_LeetCode-codeforces-lintcode-others-
