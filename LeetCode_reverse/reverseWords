@@ -1,0 +1,45 @@
+给定一个字符串，逐个翻转字符串中的每个单词。
+注意 这里会有许多多余的空格，需要你处理掉。
+很简单，可以O(1)空间复杂度实现（原地操作）
+当然要借助基础的反转。
+
+首先全部反转，单词部分每个都是反向的，所以之后我们每次遇到一个空格都能确认一个反转区间了，再反转，每个单词都能变成正常了。
+注意，最后一个单词因为没遇到空格，要单独反转下。
+
+class Solution {
+public:
+    string reverseWords(string s) {
+        if (s.empty()) return "";
+        /*** 字符串去空格处理 ***/
+        int p = 0;
+        for (auto c : s) {
+            if (c == ' ') {
+                if (p == 0) continue;
+                else if (s[p - 1] == ' ') continue; //只保留一个空格哦
+                else s[p ++] = c;
+            }
+            else {
+                s[p ++] = c;
+            }
+        }
+        if (s[p - 1] == ' ') -- p; //结尾会多余一个空格，记得清除
+        s.resize(p); //重新确定大小
+        reverseString(s, 0, p - 1);  //整体反转
+        int lst = 0; //lst 反转区间起点
+        for (int i = 0; i < p; ++ i) {
+            if (s[i] == ' ') {
+                reverseString(s, lst, i - 1); //反转单词
+                lst = i + 1; //更新新起点
+            }
+        }
+        reverseString(s, lst, p - 1); //反转最后一个单词
+        return s;
+    }
+private:
+  // 借用基础反转string函数
+    void reverseString(string& s, int l, int r) {
+        while (l < r) {
+            swap(s[l ++], s[r --]);
+        }
+    }
+};
