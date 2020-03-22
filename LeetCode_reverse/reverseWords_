@@ -1,0 +1,27 @@
+给定一个字符串，逐个翻转字符串中的每个单词
+
+输入: ["t","h","e"," ","s","k","y"," ","i","s"," ","b","l","u","e"]
+输出: ["b","l","u","e"," ","i","s"," ","s","k","y"," ","t","h","e"]
+
+上一题的弱化版。。。
+class Solution {
+public:
+    void reverseWords(vector<char>& s) {
+        if (s.empty()) return ;
+        reverseString(s, 0, s.size() - 1);
+        int lst = 0;
+        for (int i = 0; i < s.size(); ++ i) {
+            if (s[i] == ' ') {
+                reverseString(s, lst, i - 1);
+                lst = i + 1;
+            }
+        }
+        reverseString(s, lst, s.size() - 1);
+    }
+private:
+    void reverseString(vector<char> &s, int l, int r) {
+        while (l < r) {
+            swap(s[l ++], s[r --]);
+        }
+    }
+};
