@@ -1,0 +1,57 @@
+给定一个 m x n 的矩阵，如果一个元素为 0，则将其所在行和列的所有元素都设为 0。请使用原地算法。
+显然最暴力的解法，就是开一个新数组，然后记录某行某列被消除，但显然额外空间复杂度 O(N * M) 不够优雅
+我们会发现只记录每行是否要消除 或者每列是否要消除，完全足够了，那么两个数组就可以了，如此空间复杂度 O（N + M)
+
+但是 其实我们还可以把空间复杂调整的更小一些。
+通过改变每行第一个数字、每列第一个数字是否为0，确认此行此列是否要清0
+但是显然 第一行、第一列还需要再开两个变量记录一下，但是额外空间复杂度就是常数级别的了。
+
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        // 合法输入检验
+        if (matrix.empty()) return ; int n = matrix.size();
+        if (matrix[0].empty()) return ; int m = matrix[0].size();
+        int col = 1, row = 1; // 记录第一行、第一列是否要清0
+        //先确认第一行/第一列
+        for (int i = 0; i < m; ++ i) {
+            if (matrix[0][i] == 0) {
+                row = 0; break;
+            }
+        }
+        for (int i = 0; i < n; ++ i) {
+            if (matrix[i][0] == 0) {
+                col = 0; break;
+            }
+        }
+        
+        for (int i = 1; i < n; ++ i) {
+            for (int j = 1; j < m; ++ j) {
+                if (matrix[i][j] == 0) {
+                    // 把每行第一个和每列第一个数字清0
+                    matrix[i][0] = 0;
+                    matrix[0][j] = 0;
+                }
+            }
+        }
+        for (int i = 1; i < n; ++ i) {
+            for (int j = 1; j < m; ++ j) {
+                if (matrix[i][0] == 0 or matrix[0][j] == 0) {
+                //根据本行/列来判断要不要清0
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        // 别忘了第一行和第一列处理
+        if (row == 0) {
+            for (int i = 0; i < m; ++ i) {
+                matrix[0][i] = 0;
+            }
+        }
+        if (col == 0) {
+            for (int i = 0; i < n; ++ i) {
+                matrix[i][0] = 0;
+            }
+        }
+    }
+};
