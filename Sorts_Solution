@@ -1,5 +1,3 @@
-堆排序的迭代实现 :
-
 #include <bits/stdc++.h>
 using namespace std;
 /*** 排序基础函数 ***/
@@ -8,6 +6,7 @@ public :
     virtual void Sorts(vector<int>& arr) = 0;
 };
 /******/
+/*** 堆排序的迭代实现 : ***/
 class My_Sort_Heap : public My_Sort {
 public :
     /***
@@ -50,15 +49,62 @@ private:
             Sink(arr, i, sizes); // build heap from bottom to top
         }
     }
-
 };
+
+/*** 快速排序的迭代实现 : ***/
+class My_Sort_Quick: public My_Sort {
+    /*** 
+    快速排序： 时间复杂度 最好，平均都是 O(n * log(n)) 有说法最好是 O(n), 最坏 O(n ^ 2)
+              不稳定排序， 空间复杂度O(n * log(n)可以迭代实现
+    思想就是选择一个适当的数字，将它作为区间”枢纽”， 小于他的放在左侧，大于的放在右侧，以此
+    实现排序。
+    
+    ***/
+public :
+    virtual void Sorts(vector<int>& arr) {
+        if (arr.empty()) return ; // 非法输入检测
+        stack<int> data; //迭代辅助栈
+        int n = arr.size();
+        data.push(n - 1); //记得先塞入 r 再塞入 l,（栈的性质）
+        data.push(0);
+        while (!data.empty()) {
+            int l = data.top(); data.pop();
+            int r = data.top(); data.pop();
+            int p = Partition(arr, l, r); //寻找枢纽点
+            if (p - 1 > l) { // 检测左侧区间是否需要排序
+                data.push(p - 1);
+                data.push(l);
+            }
+            if (p + 1 < r) { // 检测右侧区间是否需要排序
+                data.push(r);
+                data.push(p + 1);
+            }
+        }
+    };
+private:
+    int Partition(vector<int> &arr, int l, int r) {
+        int mid = l + ((r - l) >> 1); // 此处最好是随机一个数字，当然为了方便，取了中点。
+        swap(arr[r], arr[mid]);
+        int t = l; //t表示最终划分元素应该在的位置
+        for (int i = l; i < r; ++ i) { //从从左到右扫描
+            if (arr[i] < arr[r]) {  //找打比划分元素小的
+                swap(arr[t ++], arr[i]); // t要么等于i，交互自身，要么比i位置的元素大
+            }
+        }
+        swap(arr[t], arr[r]); //记得把枢纽点放到适合的位置
+        return t; //返回枢纽点位置
+    }
+};
+
 void Test_fuc() {
     int n; scanf("%d", &n);
     vector<int> arr(n);
     for (int i = 0; i < n; ++ i) {
         scanf("%d", &arr[i]);
     }
-    My_Sort* solution = new My_Sort_Heap;
+    /*** make your own choices ***/
+    // My_Sort* solution = new My_Sort_Heap;
+    // My_Sort* solution = new My_Sort_Quick;
     solution->Sorts(arr);
     delete solution;
     for (int i = 0; i < n; ++ i) {
