@@ -13,6 +13,7 @@ public :
     堆排序 : 时间复杂度 O(n * log(n)), 空间复杂度: O(1) (迭代实现)
     将整个数组看作一个完全二叉树，通过不断维护将整个数组保证成为一个大根堆，每次将
     完全二叉树结尾节点和根节点互换位置，然后剪去末尾节点加入数组尾部，来实现排序。
+    此种排序是不稳定排序
     ***/
     virtual void Sorts(vector<int>& arr) {
         if (arr.empty()) return ; //非法输入检测
@@ -95,6 +96,49 @@ private:
         return t; //返回枢纽点位置
     }
 };
+/*** 归并排序 ***/
+class My_Sort_Merge : public My_Sort {
+public:
+    /***
+        归并排序： 时间复杂度:O(n * log(n)) 空间复杂度:O(n * log(n))
+        是稳定排序， 核心思想在于归并，将两个有序数组合并，但是为了
+        保证两个数组有序， 我们需要由底向上更新，此种排序比较优雅，
+        可以用来计算逆序对。
+    ***/
+    virtual void Sorts(vector<int> &arr) {
+        if (arr.empty()) return ; // 非法检测
+        int n = arr.size();
+        temp.resize(n); // 确定辅助数组大小
+        Merge(arr, 0, n - 1);
+    };
+private:
+    vector<int> temp; // 辅助数组
+    void Merge(vector<int> &arr, int l, int r) {
+        if (r <= l) return ; // 递归出口
+        int mid = l + ((r - l) >> 1);
+        /*** from bottom ***/
+        Merge(arr, l, mid);
+        Merge(arr, mid + 1, r);
+        int i = l, j = mid + 1, p = l;
+        while (i <= mid and j <= r) {
+            // 选择左右数组里较小的按大小顺序合并更新在辅助数组
+            if (arr[i] <= arr[j]) {
+                temp[p ++] = arr[i ++];
+            }
+            else {
+                temp[p ++] = arr[j ++];
+                // res += mid - i + 1 (计算逆序对可以在此处更新）
+            }
+        }
+        // 判断剩余未更新部分
+        while (i <= mid) temp[p ++] = arr[i ++];
+        while (j <= r) temp[p ++] = arr[j ++];
+        // 辅助数组数据转换回原数组
+        for (int i = l; i <= r; ++ i) {
+            arr[i] = temp[i];
+        }
+    }
+};
 
 void Test_fuc() {
     int n; scanf("%d", &n);
@@ -105,6 +149,7 @@ void Test_fuc() {
     /*** make your own choices ***/
     // My_Sort* solution = new My_Sort_Heap;
     // My_Sort* solution = new My_Sort_Quick;
+    // My_Sort* solution = new My_Sort_Merge;
     solution->Sorts(arr);
     delete solution;
     for (int i = 0; i < n; ++ i) {
