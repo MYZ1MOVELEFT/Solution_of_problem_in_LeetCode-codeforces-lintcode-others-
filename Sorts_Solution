@@ -139,7 +139,42 @@ private:
         }
     }
 };
-
+/*** 计数排序 ***/
+class My_Sort_Count : public My_Sort {
+public:
+    /***
+        计数排序： 时间复杂度:O(n + k) 空间复杂度:O(k) k 为数字值域区间大小
+        思路是建立一个桶，然后根据桶内数据再排序，是一种基于值域的排序，非
+        常适合于值域区间较小但数据量较大的排序，如果数据比较零散，怎不够优
+    ***/
+    virtual void Sorts(vector<int> &arr) {
+        if (arr.empty()) return ; // 非法检测
+        int n = arr.size();
+        temp.resize(n, 0); //开辟辅助数组
+        int mnn = arr[0], mxx = arr[0];
+        // 统计数组最大值和最小值
+        for (auto x : arr) {
+            mxx = max(mxx, x);
+            mnn = min(mnn, x);
+        }
+        int sizes = mxx - mnn + 1;
+        counts.resize(sizes, 0); //开辟一个桶
+        for (auto x : arr) {
+            counts[x - mnn] ++; //使用元素作为新数组索引
+        }
+        for (int i = 1; i < sizes; ++ i) {
+            counts[i] += counts[i - 1]; //计算不大于当前元素的个数，即这个元素的最终位置
+        }
+        for (auto e : arr) {
+            int index = -- counts[e - mnn];//重复元素递减
+            temp[index] = e;//放入最终返回数组
+        }
+        arr = temp;
+    };
+private:
+    vector<int> counts; //计数数组
+    vector<int> temp; //辅助数组
+};
 void Test_fuc() {
     int n; scanf("%d", &n);
     vector<int> arr(n);
@@ -150,6 +185,7 @@ void Test_fuc() {
     // My_Sort* solution = new My_Sort_Heap;
     // My_Sort* solution = new My_Sort_Quick;
     // My_Sort* solution = new My_Sort_Merge;
+    // My_Sort* solution = new My_Sort_Count;
     solution->Sorts(arr);
     delete solution;
     for (int i = 0; i < n; ++ i) {
