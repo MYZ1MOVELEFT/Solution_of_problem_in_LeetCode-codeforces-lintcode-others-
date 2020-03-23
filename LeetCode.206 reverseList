@@ -1,0 +1,46 @@
+反转一个单链表。
+输入: 1->2->3->4->5->NULL
+输出: 5->4->3->2->1->NULL
+
+可以递归实现，但是递归毕竟要递归栈，能迭代就迭代吧，万一链表过长，递归爆炸就不好了。
+迭代方法：可以直接暴力迭代过去，设置前缀节点， 或者采用尾插法。
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+ // 设置前置节点
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if (!head or !head->next) return head;
+        ListNode* pres = nullptr; //前置节点起始为 Null
+        while (head) {
+            auto nxt = head->next; // 先记录下下一个节点
+            head->next = pres; // 指针反转
+            pres = head; // 更新前置
+            head = nxt; // 移动当前
+        }
+        return pres; //因为while break条件是 head == null, 故要返回 pres
+    }
+};
+// 尾插法
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if (!head or !head->next) return head;
+        ListNode* dummy = new ListNode(-1); //指引节点
+        dummy->next = nullptr; //起始指向null
+        while (head) {
+            auto nxt = head->next; //记录下一个
+            head->next = dummy->next; // 反向插入
+            dummy->next = head; // 更新尾部节点
+            head = nxt; // 当前节点更新
+        }
+        return dummy->next; //返回尾部
+    }
+};
