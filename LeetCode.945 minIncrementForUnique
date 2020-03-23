@@ -30,3 +30,27 @@ public:
 };
 
 但是我们时间复杂度会虽然很好，但是空间开的有些过大， 要想一些平衡策略。
+这个题目核心点就是重复的数字。
+先对数组排序，那么显然重复的数字就会在一起，而且我们可以构造每个数字都只出现一次的递增数组，如何计算答案，显然模拟就可以了
+时间复杂度要大一些， O(n * log(n)) 但空间复杂度降了下来 只有 O(log(n)) 的排序需要空间。
+
+class Solution {
+public:
+    int minIncrementForUnique(vector<int>& A) {
+        if (A.empty()) return 0;
+        sort(A.begin(), A.end());
+        int res = 0, n = A.size();
+        for (int i = 1; i < n; ++ i) {
+            if (A[i] == A[i - 1]) {
+                A[i] ++;
+                res ++;
+            }
+            else if (A[i] < A[i - 1]) {
+                res += (A[i - 1] - A[i] + 1);
+                A[i] = A[i - 1] + 1;
+                
+            }
+        }
+        return res;
+    }
+};
