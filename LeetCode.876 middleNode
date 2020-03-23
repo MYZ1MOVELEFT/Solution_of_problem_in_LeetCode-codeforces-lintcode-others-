@@ -1,0 +1,29 @@
+给定一个带有头结点 head 的非空单链表，返回链表的中间结点。
+
+如果有两个中间结点，则返回第二个中间结点。
+
+最暴力的解法是扫一遍大小然后暴力计数，但是其实一遍就可以了
+
+我们设置一个 fast指针和 slow指针， fast一次移动两位， slow一次移动一位， 显然 fast会先到达链表尾部， fast到达尾部时，slow又恰好处在
+middle 的位置（由题意，偶数个是偏右那个， 如果想偏左，可以控制while跳出条件或者设置前置哨兵节点实现）
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* middleNode(ListNode* head) {
+        if (!head or !head->next) return head;
+        auto fast = head, slow = head;
+        while (fast and fast->next) {
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+        return slow;
+    }
+};
