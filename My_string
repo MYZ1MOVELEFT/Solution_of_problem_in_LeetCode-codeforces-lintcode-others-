@@ -1,0 +1,246 @@
+#include <bits/stdc++.h>
+
+// 尚未测试成功
+class My_string {
+public:
+    typedef char* iter;
+    typedef const char* con_iter;
+    /**常用访问迭代器部分**/
+    con_iter begin() const {
+        return _str;
+    }
+    con_iter end() const {
+        return _str + _size;
+    }
+    iter begin() {
+        return _str;
+    }
+    iter end() {
+        return _str + _size;
+    }
+    /**常用算法部分**/
+    // 扩容方法与交换方法
+    void Reserve(size_t n) {
+		if (n == 0 or n > _caps) {
+			size_t newsize = n;
+			// 8倍数算法
+			if (n % 8 != 0)
+				newsize = (n / 8 + 1) * 8;
+			else
+				newsize = n + 8;
+
+			char* newstr = new char[newsize];
+			if (_str) strcpy(newstr, _str);
+			delete[] _str;
+			_str = newstr;
+			_caps = newsize - 1;
+		}
+	}
+	void Resize(size_t n, char ch = '\0') {
+        if (n <= _size) {
+            _size = n;
+            _str[_size] = '\0';
+            return ;
+        }
+        Reserve(n);
+        for (size_t i = _size; i < n; ++ i) {
+            _str[i] = ch; ++ _size;
+        }
+        _str[_size] = '\0';
+	}
+	void Swap(My_string &s) {
+        std :: swap(_str, s._str);
+        std :: swap(_size, s._size);
+        std :: swap(_caps, s._caps);
+	}
+	// 插入方法
+	void Insert(size_t pos, char c) {
+	    assert(pos <= _size);
+        if (_size == _caps) {
+            Reserve(_caps * 2);
+        }
+        for (size_t i = _size; i >= pos; -- i) {
+            _str[i + 1] = _str[i];
+        }
+        _str[pos] = c; ++ _size;
+	}
+	void Insert(size_t pos, const char* s) {
+        assert(pos <= _size);
+        size_t len = strlen(s);
+        if (_size + len > _caps) {
+            Reserve(_size + len);
+        }
+        for (size_t i = _size; i >= pos; -- i) {
+            _str[i + len] = _str[i];
+        }
+        strncpy(_str + pos, s, len);
+        _size += len;
+	}
+	void PushBack(char c) {
+        Insert(_size, c);
+	}
+    void Append(const char *s) {
+        Insert(_size, s);
+    }
+    //查找方法
+    size_t Find(char c, size_t pos = 0) {
+        for (size_t i = pos; i < _size; ++ i) {
+            if (_str[i] == c) {
+                return i;
+            }
+        }
+        return none;
+    }
+    size_t Find(const char* s, size_t pos = 0) {
+        /**
+        注意：strstr（str1，str2）
+        此时千万要记住，这是在判断str2是否是str1的子串！！
+
+        重要的事情：
+
+        这是在判断str2是否是str1的子串！！
+        这是在判断str2是否是str1的子串！！
+        这是在判断str2是否是str1的子串！！
+
+        如果是，则返回str2在str1中首次出现的地址；
+        如果不是，则返回nullptr；
+
+        **/
+        const char* ret = strstr(_str + pos, s);
+        if (ret == nullptr) return none;
+        else return ret - _str;
+    }
+
+    //删除数据接口
+	void Erase(size_t pos = 0, size_t len = none) {
+		if (pos + len >= _size) {
+			_size = pos;
+			_str[_size] = '\0';
+		}
+		else {
+			size_t start = pos + len;
+			strcpy(_str + pos, _str + start);
+			_size -= len;
+		}
+	}
+	/**构造与析构部分**/
+    My_string(const char* str = "") : _str(nullptr), _caps(0) {
+        _size = strlen(str);
+        strcpy(_str, str);
+        Reserve(_size);
+    }
+    //拷贝构造
+    My_string(const My_string &s) : _str(nullptr), _size(0), _caps(0) {
+        My_string temp(s._str);
+        Swap(temp);
+    }
+    // 析构
+    ~My_string() {
+        if (_str) {
+            delete[] _str;
+            _str = nullptr;
+            _size = _caps = 0;
+        }
+    }
+
+
+    /**重载运算符部分**/
+    // 运算 & 赋值
+    My_string& operator = (My_string s) {
+        Swap(s); return *this;
+    }
+
+    My_string& operator += (char c) {
+        PushBack(c); return *this;
+    }
+
+    My_string& operator += (const char *str) {
+        Append(str); return *this;
+    }
+    My_string operator + (char c) const {
+        My_string temp(*this);
+        temp.PushBack(c);
+        return temp;
+    }
+    My_string& operator + (const char* s) {
+        My_string temp(*this);
+        temp.Append(s);
+        return temp;
+    }
+    // 取址
+    char& operator [] (size_t pos) {
+        assert(pos < _size);
+        return _str[pos];
+    }
+    const char& operator[](size_t pos) const{
+		assert(pos < _size);
+		return _str[pos];
+	}
+	// 大小比较
+    bool operator < (const My_string &S) const {
+        size_t i = 0, j = 0;
+        while (i < _size and j < S.Size()) {
+            if (_str[i] < S[j])
+                return true;
+            else if (_str[i] > S[j])
+                return false;
+            else ++ i, ++ j;
+        }
+        if (j < S.Size()) return true;
+        else return false;
+    }
+
+    bool operator == (const My_string &S) const {
+        size_t i = 0, j = 0;
+        while (i < _size and j < S.Size()) {
+            if (_str[i] != S[j])
+                return false;
+            else ++ i, ++ j;
+        }
+        if (i == _size and j == S.Size())
+            return true;
+        else return false;
+    }
+    bool operator >(const My_string &S) const {
+        return !(*this <= S);
+    }
+    bool operator <= (const My_string &S) const {
+        return (*this < S or *this == S);
+    }
+    bool operator >= (const My_string &S) const {
+        return (*this > S or *this == S);
+    }
+    bool operator != (const My_string &S) const {
+        return !(*this == S);
+    }
+    /**接口部分**/
+    //c_str接口
+	char* c_str() const {
+		return _str;
+	}
+
+	//size()接口
+	size_t Size() const{
+		return _size;
+	}
+
+	//caps()接口
+	size_t Caps() const{
+		return _caps;
+	}
+private:
+    char *_str;
+    size_t _size;
+    size_t _caps;
+    static size_t none;
+};
+size_t My_string :: none = -1;
+
+
+void My_test() {
+    
+}
+signed main() {
+    My_test();
+    return 0;
+}
